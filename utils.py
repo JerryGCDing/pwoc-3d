@@ -8,7 +8,6 @@ from glob import glob
 
 FLOW_LIBRARY_PATH = "./data/flow_library"
 sys.path.append(FLOW_LIBRARY_PATH)
-import flow_IO
 
 
 BASEPATH_KITTI = "/work/vig/Datasets/KITTI_VoxelFlow/data_scene_flow"
@@ -18,7 +17,7 @@ BASEPATH_SPRING = './data/spring'
 __all__ = ['load_kitti_images', 'load_kitti_sf', 'load_ft3d_images',
            'load_ft3d_sf',
            'split_spring_seq', 'BASEPATH_SPRING',
-           'load_spring_images', 'load_spring_sf', 'prepare_spring_data_dict']
+           'load_spring_images', 'prepare_spring_data_dict']
 '''
 Load a PFM file into a Numpy array. Note that it will have
 a shape of H x W, not W x H. Returns a tuple containing the
@@ -118,14 +117,6 @@ def load_spring_images(*image_paths):
     img4 = imageio.imread(image_paths[3])/255.0
 
     return img1, img2, img3, img4
-
-
-def load_spring_sf(*paths):
-    disp1 = flow_IO.readDispFile(paths[0])
-    disp2 = flow_IO.readDispFile(paths[1])
-    opt_flow = flow_IO.readFlowFile(paths[2])
-
-    return disp1, disp2, opt_flow
 
 
 def load_ft3d_images(letter, sequence, frame, forward=True, subset='TRAIN'):
@@ -368,20 +359,3 @@ def make_spring_folder(data):
             os.makedirs(os.path.join(seq, f'flow_{direction}_{cam}'), exist_ok=True)
             os.makedirs(os.path.join(seq, f'disp2_{direction}_{cam}'), exist_ok=True)
         os.makedirs(os.path.join(seq, f'disp1_{cam}'), exist_ok=True)
-        
-def write_spring_predictions(prediction, data):
-    index, seq, cam, direc = data
-    seq = os.path.join("predictions", seq)
-    prediction = prediction.squeeze(0)
-    flow = prediction[:, :, :2]
-    disp1 = prediction[:, :, -2]
-    disp2 = prediction[:, :, -1]
-    disp1_path = os.path.join(
-        seq, f'disp1_{cam}', f'disp1_{cam}_{index:04d}.dsp5')
-    disp2_path = os.path.join(
-        seq, f'disp2_{direc}_{cam}', f'disp2_{direc}_{cam}_{index:04d}.dsp5')
-    flow_path = os.path.join(seq, f'flow_{direc}_{cam}',
-                             f'flow_{direc}_{cam}_{index:04d}.flo5')
-    flow_IO.writeFlo5File(flow, flow_path)
-    flow_IO.writeDsp5File(disp1, disp1_path)
-    flow_IO.writeDsp5File(disp2, disp2_path)

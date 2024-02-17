@@ -41,4 +41,4 @@ if __name__ == "__main__":
         os.mkdir('./kitti_val/flow')
 
     data = datasets.get_kitti_dataset(datasets.KITTI_VALIDATION_IDXS, batch_size=1)
-    eval('./checkpoints/pwoc3d-kitti', data)
+    eval('./data/pwoc3d-kitti', data)
