@@ -27,10 +27,9 @@ def eval(checkpoint, data):
         res = net(inputs=images)[0].numpy()
 
         file_id = f'{datasets.KITTI_VALIDATION_IDXS[idx]:06d}'
-        imageio.imwrite(f"./kitti_val/flow/{file_id}_10.png", utils.colored_flow(res[:, :, :2]))
-        imageio.imwrite(f"./kitti_val/disp_1/{file_id}_10.png", utils.colored_disparity(res[:, :, 2]))
-        imageio.imwrite(f"./kitti_val/disp_2/{file_id}_10.png",
-                        utils.colored_disparity(res[:, :, 3], maxdisp=np.max(res[:, :, 2])))
+        np.save(f"./kitti_val/flow/{file_id}_10.npy", res[:, :, :2])
+        np.save(f"./kitti_val/disp_1/{file_id}_10.npy", res[:, :, 2])
+        np.save(f"./kitti_val/disp_2/{file_id}_10.npy", res[:, :, 3])
 
 
 if __name__ == "__main__":

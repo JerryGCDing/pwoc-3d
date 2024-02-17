@@ -97,7 +97,7 @@ def load_kitti_sf(n, occ='occ'):
     d0path = os.path.join(path, "disp_%s_0/%06d_10.png" % (occ, n))
     d1path = os.path.join(path, "disp_%s_1/%06d_10.png" % (occ, n))
 
-    of = imageio.imread(ofpath, format="PNG-FI").astype(float)
+    of = imageio.imread(ofpath).astype(float)
     u = (of[:, :, 0] - 2 ** 15) / 64.0
     v = (of[:, :, 1] - 2 ** 15) / 64.0
     d0 = imageio.imread(d0path) / 256.0
