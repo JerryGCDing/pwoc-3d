@@ -7,21 +7,25 @@ import os
 from tqdm import tqdm
 import json
 
-
 KITTI_MEAN_PIXEL = [0.3791041, 0.39846687, 0.38367166]  # RGB
 FT3D_MEAN_PIXEL = [0.424101, 0.40341005, 0.36796424]  # RGB
 SPRING_MEAN_PIXEL = [0.21417567, 0.2714196, 0.29755503]  # RGB
 
-KITTI_TRAIN_IDXS = [2, 43, 44, 158, 78, 102, 56, 13, 107, 99, 31, 55, 54, 129, 85, 151, 173, 186, 195, 130, 48, 196, 154, 28, 165,
-                    63, 60, 161, 140, 194, 104, 114, 35, 16, 152, 77, 126, 23, 125, 10, 86, 124, 160, 80, 98, 193, 69, 118, 115,
-                    30, 92, 134, 71, 57, 8, 178, 38, 182, 27, 67, 36, 139, 91, 6, 49, 179, 184, 84, 81, 188, 101, 5, 141, 166,
-                    113, 12, 199, 65, 128, 18, 41, 82, 53, 146, 187, 14, 19, 34, 21, 46, 180, 172, 106, 137, 145, 153, 191, 20,
-                    22, 144, 70, 183, 190, 29, 156, 119, 25, 135, 1, 176, 103, 42, 33, 3, 17, 64, 108, 75, 164, 11, 143, 88, 117,
-                    26, 4, 162, 177, 83, 73, 171, 109, 111, 15, 50, 100, 181, 167, 148, 79, 168, 76, 94, 121, 89, 198, 68, 138,
-                    112, 170, 72, 120, 155, 66, 149, 47, 59, 90, 185, 189, 105, 52, 132, 45, 110, 127, 7, 157, 96, 24, 122, 147,
-                    116, 0, 9, 58, 97, 62, 192, 142, 123]
+KITTI_TRAIN_IDXS = [2, 43, 44, 158, 78, 102, 56, 13, 107, 99, 31, 55, 54, 129, 85, 151, 173, 186, 195, 130, 48, 196,
+                    154, 28, 165, 63, 60, 161, 140, 194, 104, 114, 35, 16, 152, 77, 126, 23, 125, 10, 86, 124, 160, 80,
+                    98, 193, 69, 118, 115, 30, 92, 134, 71, 57, 8, 178, 38, 182, 27, 67, 36, 139, 91, 6, 49, 179, 184,
+                    84, 81, 188, 101, 5, 141, 166, 113, 12, 199, 65, 128, 18, 41, 82, 53, 146, 187, 14, 19, 34, 21, 46,
+                    180, 172, 106, 137, 145, 153, 191, 20, 22, 144, 70, 183, 190, 29, 156, 119, 25, 135, 1, 176, 103,
+                    42, 33, 3, 17, 64, 108, 75, 164, 11, 143, 88, 117, 26, 4, 162, 177, 83, 73, 171, 109, 111, 15, 50,
+                    100, 181, 167, 148, 79, 168, 76, 94, 121, 89, 198, 68, 138, 112, 170, 72, 120, 155, 66, 149, 47, 59,
+                    90, 185, 189, 105, 52, 132, 45, 110, 127, 7, 157, 96, 24, 122, 147, 116, 0, 9, 58, 97, 62, 192, 142,
+                    123]
+'''
 KITTI_VALIDATION_IDXS = [95, 159, 175, 37, 74, 93, 174, 40,
                          133, 131, 150, 163, 39, 136, 169, 61, 197, 87, 32, 51]
+'''
+KITTI_VALIDATION_IDXS = [14, 17, 20, 22, 30, 36, 52, 56, 57, 59, 68, 70, 71, 73, 80, 83, 87, 95, 107, 112, 114, 115,
+                         118, 119, 123, 125, 132, 136, 137, 142, 149, 154, 155, 159, 170, 183, 184, 185, 192, 197]
 KITTI_DEBUG_IDXS = KITTI_TRAIN_IDXS[:2]
 KITTI_TRAIN_SAMPLES = 180
 KITTI_VALIDATION_SAMPLES = 20
@@ -29,16 +33,18 @@ KITTI_DEBUG_SAMPLES = 2
 
 FT3D_LETTER_LISTS = {
     # 730
-    'A': list(filter(lambda x: x not in [12, 18, 96, 132, 186, 441, 456, 483, 653, 676, 728]+[60, 91, 169, 179, 364, 398, 518, 521, 658], range(750))),
+    'A': list(filter(
+        lambda x: x not in [12, 18, 96, 132, 186, 441, 456, 483, 653, 676, 728] + [60, 91, 169, 179, 364, 398, 518, 521,
+                                                                                   658], range(750))),
     # 741
-    'B': list(filter(lambda x: x not in [18, 172, 316, 400, 459]+[53, 189, 424, 668], range(750))),
+    'B': list(filter(lambda x: x not in [18, 172, 316, 400, 459] + [53, 189, 424, 668], range(750))),
     # 742
     'C': list(filter(lambda x: x not in [31, 80, 140, 260, 323, 398, 419, 651], range(750))),
 }
 FT3D_TRAIN_LIST = list(t for t in ((letter, seq, frame) for letter in [
-                       'A', 'B', 'C'] for seq in FT3D_LETTER_LISTS[letter][:-50] for frame in range(6, 16)))
+    'A', 'B', 'C'] for seq in FT3D_LETTER_LISTS[letter][:-50] for frame in range(6, 16)))
 FT3D_VALIDATION_LIST = list(t for t in ((letter, seq, frame) for letter in [
-                            'A', 'B', 'C'] for seq in FT3D_LETTER_LISTS[letter][-50:] for frame in range(6, 16)))
+    'A', 'B', 'C'] for seq in FT3D_LETTER_LISTS[letter][-50:] for frame in range(6, 16)))
 FT3D_TRAINING_SAMPLES = len(FT3D_TRAIN_LIST)  # 20630
 FT3D_VALIDATION_SAMPLES = len(FT3D_VALIDATION_LIST)  # 1500
 
@@ -55,7 +61,7 @@ if os.path.exists(os.path.join(BASEPATH_SPRING, 'spring', 'train')):
 def _kitti_data_with_labels(idxs):
     # cam_signal determinges whether its left-right disparity or right-left disparity
     # for uniformity among all the dataloaders
-    cam_signal = 1 
+    cam_signal = 1
     for n in idxs:
         images = load_kitti_images(n)
         sf = load_kitti_sf(n)
@@ -64,7 +70,7 @@ def _kitti_data_with_labels(idxs):
 
 def _ft3d_data_with_labels(dataset_name, shuffle=False, temporal_augmentation=False):
     # for uniformity among all the dataloaders
-    cam_signal = 1 
+    cam_signal = 1
     if dataset_name == 'TRAIN':
         data_list = FT3D_TRAIN_LIST
     elif dataset_name == 'VALID':
@@ -89,8 +95,6 @@ def _ft3d_data_with_labels(dataset_name, shuffle=False, temporal_augmentation=Fa
 
 
 def _augment(images, sf, vertical_flipping=False):
-
-
     images, cam_signal = images
     stacked_images = tf.stack(images, axis=0)
 
@@ -125,19 +129,18 @@ def _augment(images, sf, vertical_flipping=False):
 
     images = (augmented_images[0], augmented_images[1],
               augmented_images[2], augmented_images[3])
-    
+
     images = (images, cam_signal)
 
     return images, sf
 
 
 def _random_crop(images, sf, target_size):
-
     images, cam_signal = images
- 
-    stacked_batch = tf.concat(images+(sf,), axis=2)
+
+    stacked_batch = tf.concat(images + (sf,), axis=2)
     cropped_stack = tf.image.random_crop(
-        stacked_batch, size=target_size+(4*3+4,))
+        stacked_batch, size=target_size + (4 * 3 + 4,))
 
     sf = cropped_stack[:, :, 12:]
     images = (cropped_stack[:, :, 0:3], cropped_stack[:, :, 3:6],
@@ -149,8 +152,7 @@ def _random_crop(images, sf, target_size):
 
 
 def get_kitti_dataset(idxs, batch_size, augment=False, shuffle=False, crop=False):
-
-    output_types = ((4*(tf.float32,), tf.int32), tf.float32)
+    output_types = ((4 * (tf.float32,), tf.int32), tf.float32)
 
     dataset = tf.data.Dataset.from_generator(lambda: _kitti_data_with_labels(idxs),
                                              output_types=output_types)
@@ -168,12 +170,13 @@ def get_kitti_dataset(idxs, batch_size, augment=False, shuffle=False, crop=False
     return dataset
 
 
-def get_ft3d_dataset(subset, batch_size, augment=False, random_cropping=True, shuffle=False, temporal_augmentation=False):
-
-    output_types = ((4*(tf.float32,), tf.int32), tf.float32)
-    dataset = tf.data.Dataset.from_generator(lambda: _ft3d_data_with_labels(subset, shuffle=shuffle, temporal_augmentation=temporal_augmentation),
-                                             output_types=output_types
-                                             )
+def get_ft3d_dataset(subset, batch_size, augment=False, random_cropping=True, shuffle=False,
+                     temporal_augmentation=False):
+    output_types = ((4 * (tf.float32,), tf.int32), tf.float32)
+    dataset = tf.data.Dataset.from_generator(
+        lambda: _ft3d_data_with_labels(subset, shuffle=shuffle, temporal_augmentation=temporal_augmentation),
+        output_types=output_types
+    )
     if random_cropping:
         dataset = dataset.map(map_func=lambda ims, gt: _random_crop(
             ims, gt, target_size=(512, 960)), num_parallel_calls=tf.data.experimental.AUTOTUNE)
@@ -186,12 +189,12 @@ def get_ft3d_dataset(subset, batch_size, augment=False, random_cropping=True, sh
 
 
 class SpringDataset:
-
     """
     A Spring Dataset class that can be used to obatin train and test datasets.
     """
 
-    def __init__(self, root: str, indices, data_dict, split: str = 'train', subsample_groundtruth: bool = True, shuffle: bool = False):
+    def __init__(self, root: str, indices, data_dict, split: str = 'train', subsample_groundtruth: bool = True,
+                 shuffle: bool = False):
         """
         :param: root: Path where the spring/original exits (including spring/original_
         :param: split: type of split. supports only test and train (not validation. validation is controlled by indices)
@@ -240,9 +243,9 @@ class SpringDataset:
                     othercam = "left"
 
                 if direction == "FW":
-                    othertimestep = frame+1
+                    othertimestep = frame + 1
                 else:
-                    othertimestep = frame-1
+                    othertimestep = frame - 1
 
                 # same time step, other cam
                 img2_path = os.path.join(
@@ -295,11 +298,10 @@ def get_spring_dataset(spring_dataset: SpringDataset,
                        augment: bool = False,
                        crop: bool = False,
                        cache_path=None):
-
-    output_types = ((4*(tf.float32,), tf.int32), tf.float32)
+    output_types = ((4 * (tf.float32,), tf.int32), tf.float32)
 
     if split == 'test':
-        output_types = (4*(tf.float32,), tf.int32)
+        output_types = (4 * (tf.float32,), tf.int32)
 
     dataset = tf.data.Dataset.from_generator(lambda: spring_dataset,
                                              output_types=output_types)

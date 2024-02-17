@@ -8,8 +8,6 @@ import numpy as np
 import datasets
 import network
 import metrics
-import argparse
-from utils import write_spring_predictions, make_spring_folder
 
 
 def eval(checkpoint, data, outstream):
@@ -24,7 +22,7 @@ def eval(checkpoint, data, outstream):
     sf_metric = metrics.SceneFlowMetrics()
 
     # make predictions
-    for e,(images, gt) in enumerate(data):
+    for e, (images, gt) in enumerate(data):
         print("Evaluating sequence %d..." % e)
         # predict scene flow
         res = net(inputs=images)
@@ -35,9 +33,7 @@ def eval(checkpoint, data, outstream):
     sf_metric.print(stream=outstream)
 
 
-
 if __name__ == "__main__":
-
     arg = sys.argv[1]
     if 'kitti' in arg:
         data = datasets.get_kitti_dataset(datasets.KITTI_VALIDATION_IDXS, batch_size=1)
@@ -50,7 +46,6 @@ if __name__ == "__main__":
         test_dataset = datasets.SpringDataset(root, indices, scene_dict, split)
         data = datasets.get_spring_dataset(test_dataset, 1, split=split)
         eval(arg, data, outstream=sys.stdout)
-        
+
     else:
         raise ValueError(f"checkpoint name should have 'spring' or 'kitti' but given {arg}")
-    

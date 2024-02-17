@@ -11,7 +11,7 @@ sys.path.append(FLOW_LIBRARY_PATH)
 import flow_IO
 
 
-BASEPATH_KITTI = "./data/kitti/"
+BASEPATH_KITTI = "/work/vig/Datasets/KITTI_VoxelFlow/data_scene_flow"
 BASEPATH_FT3D = './data/ft3d/'
 BASEPATH_SPRING = './data/spring'
 
