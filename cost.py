@@ -7,7 +7,7 @@ import network
 with backend.get_graph().as_default():
     net = network.Network()
 
-inp = Input((375, 1242, 3))
+inp = ((Input((375, 1242, 3)), Input((375, 1242, 3)), Input((375, 1242, 3)), Input((375, 1242, 3))), Input((1,)))
 out = net(inputs=inp)
 model = Model(inp, out)
 
